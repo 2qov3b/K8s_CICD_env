@@ -9,7 +9,7 @@ video:
 ---
 
 {% comment %}
-[Reddit Discussion](https://www.reddit.com/r/hackertools/comments/anic30/course_overview_iap_2019/)
+[Configure for containers](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
 {% endcomment %}
 
 # Prerequisite
@@ -1468,4 +1468,37 @@ Latest Commit Hash is ch1_8376ed1
 Latest Commit Log is ch1_add prodiction for kustomize
 IP address list are ch1_10.244.2.3 
 Datetime is Sat May  2 08:40:52 UTC 2020
+```
+
+But when you $ curl 172.18.0.4:30122
+again, you will get other IPs because we deploy 3 different pods.
+
+```console
+$ kubectl get pods -o wide
+NAME                         READY   STATUS    RESTARTS   AGE   IP           NODE           NOMINATED NODE   READINESS GATES
+debug-pod-6845ffcd87-v4cnj   1/1     Running   0          20h   10.244.2.2   kind-worker    <none>           <none>
+nginx-7b88dbd6bc-7tpcb       1/1     Running   0          20h   10.244.1.3   kind-worker2   <none>           <none>
+nginx-7b88dbd6bc-9zxqk       1/1     Running   0          20h   10.244.1.2   kind-worker2   <none>           <none>
+nginx-7b88dbd6bc-fngc9       1/1     Running   0          20h   10.244.2.3   kind-worker    <none>           <none>
+vagrant@k8s-dev:~/ken/cicd/application/yamls$ curl 172.18.0.4:30122
+Hostname is ch1_nginx-7b88dbd6bc-9zxqk
+Latest Commit Hash is ch1_8376ed1
+Latest Commit Log is ch1_add prodiction for kustomize
+IP address list are ch1_10.244.1.2 
+Datetime is Sat May  2 08:40:40 UTC 2020
+```
+
+`kube-apiserver ---(timeout) --> kubelet(node) ---(timeout) --> ConfigMap --> Mount --> Pod`
+
+```console
+$ curl 172.18.0.4:30122/test/index2.html
+cousre-testing file from ConfigMap
+$ vi conf.yaml 
+$ kubectl apply -f conf.yaml 
+configmap/index2 configured
+$ curl 172.18.0.4:30122/test/index2.html
+cousre-testing file from ConfigMap
+test
+la la la
+I am testing.
 ```
